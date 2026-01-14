@@ -220,17 +220,45 @@ export async function initDatabase() {
             )
         `);
 
+        // Stats Channels (for server stats display)
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS stats_channels (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                channel_id TEXT NOT NULL,
+                stat_type TEXT NOT NULL,
+                format TEXT,
+                created_at INTEGER DEFAULT (strftime('%s', 'now')),
+                UNIQUE(guild_id, stat_type)
+            )
+        `);
+
+        // Bot Outbox (for queued messages from Laravel)
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS bot_outbox(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT,
+                channel_id TEXT NOT NULL,
+                message_type TEXT DEFAULT 'text',
+                content TEXT,
+                embed_data TEXT,
+                status TEXT DEFAULT 'pending',
+                created_at INTEGER DEFAULT(strftime('%s', 'now')),
+                sent_at INTEGER
+            )
+            `);
+
         // Reminders table
         db.exec(`
-            CREATE TABLE IF NOT EXISTS reminders (
+            CREATE TABLE IF NOT EXISTS reminders(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id TEXT NOT NULL,
                 channel_id TEXT NOT NULL,
                 message TEXT NOT NULL,
                 remind_at TEXT NOT NULL,
-                created_at INTEGER DEFAULT (strftime('%s', 'now'))
+                created_at INTEGER DEFAULT(strftime('%s', 'now'))
             )
-        `);
+            `);
 
         console.log('[DB] Tables initialized successfully.');
     } catch (error) {
