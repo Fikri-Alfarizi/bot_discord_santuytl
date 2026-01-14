@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - SantuyTL</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #10b981;
+            /* Emerald/Safe Green */
+            --accent-glow: rgba(16, 185, 129, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p,
+        ul {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style: none;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        li::before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .data-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #fff;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .blob {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            filter: blur(100px);
+            opacity: 0.15;
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 10s infinite alternate;
+        }
+
+        .blob-1 {
+            top: -100px;
+            right: -100px;
+        }
+
+        .blob-2 {
+            bottom: -100px;
+            left: -100px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-30px, -30px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <h1>Privacy Policy</h1>
+        <p>Your privacy is important to us. This policy outlines what data <strong>SantuyTL</strong> collects and how it
+            is used.</p>
+
+        <h2>What Data We Collect</h2>
+        <ul class="data-list">
+            <li><strong>Discord User ID:</strong> To identify you within the system.</li>
+            <li><strong>Server ID:</strong> To manage guild-specific settings.</li>
+            <li><strong>Activity Data:</strong> Such as XP, Levels, Coins, and Items inventory.</li>
+        </ul>
+
+        <h2>How We Use Data</h2>
+        <p>This data is used <strong>solely for bot functionality</strong> (e.g., tracking your rank, economy balance,
+            and preferences).</p>
+        <p>We do <strong>not</strong> share your data with third parties or use it for advertising.</p>
+        <p>No real personal data (names, addresses, photos) is collected beyond what is publicly available via the
+            Discord API.</p>
+
+        <h2>Data Removal</h2>
+        <p>Users may request full data deletion by contacting the development team or owner via the Discord Server.</p>
+
+        <footer>
+            &copy; 2025 SantuyTL. All rights reserved. <br>
+            <a href="/terms.html">Terms of Service</a>
+        </footer>
+    </div>
+</body>
+
+</html>

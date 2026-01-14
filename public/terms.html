@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - SantuyTL</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #5865F2; /* Discord Blurple */
+            --accent-glow: rgba(88, 101, 242, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .terms-list {
+            list-style: none;
+            counter-reset: term-counter;
+        }
+
+        .term-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .term-item::before {
+            counter-increment: term-counter;
+            content: counter(term-counter);
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            opacity: 0.5;
+        }
+
+        .term-item:hover {
+            transform: translateX(10px);
+            background: rgba(255,255,255,0.05);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #fff;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Float Animation for Background blobs */
+        .blob {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            filter: blur(100px);
+            opacity: 0.15;
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 10s infinite alternate;
+        }
+
+        .blob-1 { top: -100px; left: -100px; }
+        .blob-2 { bottom: -100px; right: -100px; animation-delay: -5s; }
+
+        @keyframes float {
+            from { transform: translate(0, 0); }
+            to { transform: translate(30px, 30px); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 25px; }
+            h1 { font-size: 2rem; }
+            .term-item { padding-left: 20px; text-align: center; }
+            .term-item::before { position: static; display: block; margin-bottom: 10px; transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <h1>Terms of Service</h1>
+        <p class="subtitle">By using the <strong>SantuyTL</strong> Discord Bot, you agree to the following terms:</p>
+
+        <ul class="terms-list">
+            <li class="term-item">
+                The bot is provided <strong>"as-is"</strong> without any warranties of any kind.
+            </li>
+            <li class="term-item">
+                The bot <strong>does not guarantee uptime</strong> or data persistence. We strive for stability but outages may happen.
+            </li>
+            <li class="term-item">
+                Users may not <strong>exploit, abuse, or misuse</strong> the bot in any way that harms the service or other users.
+            </li>
+            <li class="term-item">
+                Virtual currencies, XP, and rewards have <strong>no real-world value</strong> and cannot be exchanged for fiat money.
+            </li>
+            <li class="term-item">
+                The developers reserve the right to <strong>modify or discontinue</strong> features at any time without prior notice.
+            </li>
+        </ul>
+
+        <footer>
+            &copy; 2025 SantuyTL. All rights reserved. <br>
+            <a href="/privacy.html">Privacy Policy</a>
+        </footer>
+    </div>
+
+    <script>
+        // Simple entry interaction
+        const items = document.querySelectorAll('.term-item');
+        items.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.animation = `slideUp 0.5s ease forwards ${index * 0.1 + 0.5}s`;
+        });
+    </script>
+</body>
+</html>

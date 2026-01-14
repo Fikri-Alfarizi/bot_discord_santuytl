@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('reaction_roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('guild_id');
+            $table->string('channel_id');
+            $table->string('message_id');
+            $table->string('role_id');
+            $table->string('emoji'); // Can be unicode or custom ID
+            $table->bigInteger('created_at')->nullable(); // Controller inserts now()->timestamp
+            
+            // Optional: Index on guild_id for faster lookups since we query by it
+            $table->index('guild_id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('reaction_roles');
+    }
+};
