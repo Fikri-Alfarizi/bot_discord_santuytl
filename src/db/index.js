@@ -1,179 +1,243 @@
-import pool, { query, get, all, transaction } from './mysql.js';
+import db, { query, get, all, transaction } from './sqlite.js';
 
 // Table Initialization Script (Safe to run multiple times)
 // We use 'CREATE TABLE IF NOT EXISTS'
 
 export async function initDatabase() {
-    console.log('[DB] Initializing MySQL Database...');
+    console.log('[DB] Initializing SQLite Database...');
 
-    const connection = await pool.getConnection();
     try {
         // Users Table
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS users (
-                id VARCHAR(255) PRIMARY KEY,
-                username VARCHAR(255),
-                xp INT DEFAULT 0,
-                level INT DEFAULT 1,
-                coins INT DEFAULT 0,
-                last_daily BIGINT DEFAULT 0,
-                last_weekly BIGINT DEFAULT 0,
-                is_afk TINYINT DEFAULT 0,
+                id TEXT PRIMARY KEY,
+                username TEXT,
+                xp INTEGER DEFAULT 0,
+                level INTEGER DEFAULT 1,
+                coins INTEGER DEFAULT 0,
+                last_daily INTEGER DEFAULT 0,
+                last_weekly INTEGER DEFAULT 0,
+                is_afk INTEGER DEFAULT 0,
                 afk_reason TEXT,
-                afk_timestamp BIGINT DEFAULT 0,
-                job VARCHAR(255) DEFAULT 'Pengangguran',
-                daily_spins INT DEFAULT 0,
-                last_spin_time BIGINT DEFAULT 0,
-                seasonal_xp INT DEFAULT 0
+                afk_timestamp INTEGER DEFAULT 0,
+                job TEXT DEFAULT 'Pengangguran',
+                daily_spins INTEGER DEFAULT 0,
+                last_spin_time INTEGER DEFAULT 0,
+                seasonal_xp INTEGER DEFAULT 0
             )
         `);
 
         // Guild Settings
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS guild_settings (
-                guild_id VARCHAR(255) PRIMARY KEY,
-                welcome_channel_id VARCHAR(255),
-                leave_channel_id VARCHAR(255),
-                log_channel_id VARCHAR(255),
-                game_source_channel_id VARCHAR(255),
-                request_channel_id VARCHAR(255),
-                news_channel_id VARCHAR(255),
-                general_chat_channel_id VARCHAR(255),
+                guild_id TEXT PRIMARY KEY,
+                welcome_channel_id TEXT,
+                leave_channel_id TEXT,
+                log_channel_id TEXT,
+                game_source_channel_id TEXT,
+                request_channel_id TEXT,
+                news_channel_id TEXT,
+                general_chat_channel_id TEXT,
                 welcome_message TEXT,
-                auto_role_id VARCHAR(255),
-                welcome_enabled TINYINT DEFAULT 0,
-                welcome_embed_enabled TINYINT DEFAULT 0,
-                welcome_embed_title VARCHAR(255),
+                auto_role_id TEXT,
+                welcome_enabled INTEGER DEFAULT 0,
+                welcome_embed_enabled INTEGER DEFAULT 0,
+                welcome_embed_title TEXT,
                 welcome_embed_description TEXT,
-                welcome_embed_color VARCHAR(10),
+                welcome_embed_color TEXT,
                 welcome_embed_image TEXT,
                 welcome_embed_thumbnail TEXT,
-                welcome_dm_enabled TINYINT DEFAULT 0,
+                welcome_dm_enabled INTEGER DEFAULT 0,
                 welcome_dm_message TEXT,
-                goodbye_enabled TINYINT DEFAULT 0,
-                goodbye_channel_id VARCHAR(255),
+                goodbye_enabled INTEGER DEFAULT 0,
+                goodbye_channel_id TEXT,
                 goodbye_message TEXT,
-                goodbye_embed_enabled TINYINT DEFAULT 0,
-                goodbye_embed_title VARCHAR(255),
+                goodbye_embed_enabled INTEGER DEFAULT 0,
+                goodbye_embed_title TEXT,
                 goodbye_embed_description TEXT,
-                goodbye_embed_color VARCHAR(10),
-                auto_role_enabled TINYINT DEFAULT 0
+                goodbye_embed_color TEXT,
+                auto_role_enabled INTEGER DEFAULT 0
             )
         `);
 
         // News History
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS news_history (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                news_guid VARCHAR(255) UNIQUE,
-                created_at BIGINT
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                news_guid TEXT UNIQUE,
+                created_at INTEGER
             )
         `);
 
         // Big Server Features
         // 1. Seasons
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS seasons (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                season_number INT,
-                name VARCHAR(255),
-                start_date BIGINT,
-                end_date BIGINT,
-                is_active TINYINT DEFAULT 1
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                season_number INTEGER,
+                name TEXT,
+                start_date INTEGER,
+                end_date INTEGER,
+                is_active INTEGER DEFAULT 1
             )
         `);
 
         // 2. Reputation
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS reputation (
-                user_id VARCHAR(255) PRIMARY KEY,
-                rep_points INT DEFAULT 0,
-                last_given BIGINT DEFAULT 0
+                user_id TEXT PRIMARY KEY,
+                rep_points INTEGER DEFAULT 0,
+                last_given INTEGER DEFAULT 0
             )
         `);
 
         // 3. Trust Score
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS trust_score (
-                user_id VARCHAR(255) PRIMARY KEY,
-                score INT DEFAULT 100,
+                user_id TEXT PRIMARY KEY,
+                score INTEGER DEFAULT 100,
                 reason TEXT
             )
         `);
 
-        // 4. Invites 
-        // Managed by Laravel Migration (2025_01_01_000010_create_invites_table.php)
-        /*
-        await connection.query(`
-            CREATE TABLE IF NOT EXISTS invites (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                inviter_id VARCHAR(255),
-                invited_id VARCHAR(255),
-                timestamp BIGINT,
-                is_valid TINYINT DEFAULT 1,
-                UNIQUE KEY unique_invite (inviter_id, invited_id)
-            )
-        `);
-        */
-
         // 5. Inventory
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS inventory (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id VARCHAR(255) NOT NULL,
-                item_id VARCHAR(255) NOT NULL,
-                quantity INT DEFAULT 1,
-                expires_at BIGINT,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL,
+                item_id TEXT NOT NULL,
+                quantity INTEGER DEFAULT 1,
+                expires_at INTEGER,
                 metadata TEXT,
-                created_at BIGINT DEFAULT (UNIX_TIMESTAMP())
+                created_at INTEGER DEFAULT (strftime('%s', 'now'))
             )
         `);
 
         // 6. Reaction Roles
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS reaction_roles (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                guild_id VARCHAR(255) NOT NULL,
-                message_id VARCHAR(255) NOT NULL,
-                channel_id VARCHAR(255) NOT NULL,
-                role_id VARCHAR(255) NOT NULL,
-                emoji VARCHAR(255) NOT NULL,
-                type VARCHAR(50) DEFAULT 'normal',
-                created_at BIGINT DEFAULT (UNIX_TIMESTAMP())
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                message_id TEXT NOT NULL,
+                channel_id TEXT NOT NULL,
+                role_id TEXT NOT NULL,
+                emoji TEXT NOT NULL,
+                type TEXT DEFAULT 'normal',
+                created_at INTEGER DEFAULT (strftime('%s', 'now'))
             )
         `);
 
         // 7. Moderator (Auto Mod & Warns)
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS automod_rules (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                guild_id VARCHAR(255) NOT NULL,
-                trigger_type VARCHAR(50) NOT NULL, -- bad_word, link, spam
-                trigger_content TEXT, -- JSON array or comma separated
-                action VARCHAR(50) DEFAULT 'delete', -- delete, timeout, kick, ban
-                enabled TINYINT DEFAULT 1
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                trigger_type TEXT NOT NULL,
+                trigger_content TEXT,
+                action TEXT DEFAULT 'delete',
+                enabled INTEGER DEFAULT 1
             )
         `);
 
-        await connection.query(`
+        db.exec(`
             CREATE TABLE IF NOT EXISTS warns (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                guild_id VARCHAR(255) NOT NULL,
-                user_id VARCHAR(255) NOT NULL,
-                moderator_id VARCHAR(255) NOT NULL,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                moderator_id TEXT NOT NULL,
                 reason TEXT,
-                timestamp BIGINT DEFAULT (UNIX_TIMESTAMP())
+                timestamp INTEGER DEFAULT (strftime('%s', 'now'))
+            )
+        `);
+
+        // Birthdays
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS birthdays (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                user_name TEXT,
+                day INTEGER,
+                month INTEGER,
+                created_at INTEGER,
+                updated_at INTEGER,
+                UNIQUE(guild_id, user_id)
+            )
+        `);
+
+        // Invites
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS invites (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                inviter_id TEXT NOT NULL,
+                invited_id TEXT NOT NULL,
+                code TEXT,
+                timestamp INTEGER,
+                is_valid INTEGER DEFAULT 1,
+                is_fake INTEGER DEFAULT 0,
+                created_at INTEGER,
+                updated_at INTEGER,
+                UNIQUE(inviter_id, invited_id)
+            )
+        `);
+
+        // Level Rewards
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS level_rewards (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                level INTEGER NOT NULL,
+                role_id TEXT NOT NULL,
+                created_at INTEGER DEFAULT (strftime('%s', 'now'))
+            )
+        `);
+
+        // Custom Commands
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS custom_commands (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                trigger TEXT NOT NULL,
+                response TEXT,
+                is_embed INTEGER DEFAULT 0,
+                embed_data TEXT,
+                created_at INTEGER DEFAULT (strftime('%s', 'now'))
+            )
+        `);
+
+        // Automations
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS automations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                event TEXT NOT NULL,
+                trigger_value TEXT,
+                action_type TEXT,
+                action_value TEXT,
+                is_active INTEGER DEFAULT 1,
+                created_at INTEGER DEFAULT (strftime('%s', 'now'))
+            )
+        `);
+
+        // Reminders table
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS reminders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL,
+                channel_id TEXT NOT NULL,
+                message TEXT NOT NULL,
+                remind_at TEXT NOT NULL,
+                created_at INTEGER DEFAULT (strftime('%s', 'now'))
             )
         `);
 
         console.log('[DB] Tables initialized successfully.');
     } catch (error) {
         console.error('[DB ERROR] Init failed:', error);
-    } finally {
-        connection.release();
     }
 }
 
 // Export the adapter methods for usage in services
 export { query, get, all, transaction };
-export default pool;
+export default db;

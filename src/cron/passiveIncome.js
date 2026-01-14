@@ -24,13 +24,13 @@ export async function distributePassiveIncome(client) {
 
         if (onlineUsers.length === 0) return;
 
-        // UPSERT SQL for MySQL
+        // UPSERT SQL for SQLite
         const sql = `
             INSERT INTO users (id, username, coins) 
             VALUES (?, ?, ${REWARD_PER_MINUTE})
-            ON DUPLICATE KEY UPDATE 
+            ON CONFLICT(id) DO UPDATE SET 
             coins = coins + ${REWARD_PER_MINUTE},
-            username = VALUES(username)
+            username = excluded.username
         `;
 
         // Run updates in parallel

@@ -10,12 +10,11 @@ class TrustService {
         const currentScore = await this.getTrustScore(userId);
         const newScore = Math.max(0, currentScore - amount); // Floor at 0
 
-        // Use UPSERT for atomic update
+        // Use UPSERT for atomic update (SQLite syntax)
         await query(`
-            INSERT INTO trust_score (user_id, score, reason) 
+            INSERT OR REPLACE INTO trust_score (user_id, score, reason) 
             VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE score = ?, reason = ?
-        `, [userId, newScore, reason, newScore, reason]);
+        `, [userId, newScore, reason]);
 
         return newScore;
     }

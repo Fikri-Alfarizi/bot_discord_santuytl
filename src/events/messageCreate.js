@@ -190,10 +190,18 @@ export default {
             }
 
             try {
-                const { query } = await import('../db/index.js');
-                // upsert
-                await query('INSERT INTO birthdays (guild_id, user_id, user_name, day, month, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE day = VALUES(day), month = VALUES(month), user_name = VALUES(user_name)',
-                    [message.guild.id, message.author.id, message.author.username, day, month]);
+                const { query, get } = await import('../db/index.js');
+                const now = Math.floor(Date.now() / 1000);
+
+                // Check if exists
+                const exists = await get('SELECT * FROM birthdays WHERE guild_id = ? AND user_id = ?', [message.guild.id, message.author.id]);
+                if (exists) {
+                    await query('UPDATE birthdays SET day = ?, month = ?, user_name = ?, updated_at = ? WHERE guild_id = ? AND user_id = ?',
+                        [day, month, message.author.username, now, message.guild.id, message.author.id]);
+                } else {
+                    await query('INSERT INTO birthdays (guild_id, user_id, user_name, day, month, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                        [message.guild.id, message.author.id, message.author.username, day, month, now, now]);
+                }
 
                 return message.reply(`🎂 Birthday saved! I will wish you a happy birthday on **${day}-${month}**!`);
             } catch (e) {

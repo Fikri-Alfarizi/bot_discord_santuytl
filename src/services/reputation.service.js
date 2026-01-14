@@ -21,17 +21,21 @@ class ReputationService {
             return { success: false, message: "Gak bisa kasih Rep ke diri sendiri lah, kocak!" };
         }
 
-        // Update Giver's cooldown logic - using UPSERT equivalent logic
-        await query(`
-            INSERT INTO reputation (user_id, rep_points, last_given) VALUES (?, 0, ?)
-            ON DUPLICATE KEY UPDATE last_given = VALUES(last_given)
-        `, [giverId, now]);
+        // Update Giver's cooldown logic - using SQLite UPSERT
+        const giverExists = await get('SELECT user_id FROM reputation WHERE user_id = ?', [giverId]);
+        if (giverExists) {
+            await query('UPDATE reputation SET last_given = ? WHERE user_id = ?', [now, giverId]);
+        } else {
+            await query('INSERT INTO reputation (user_id, rep_points, last_given) VALUES (?, 0, ?)', [giverId, now]);
+        }
 
-        // Add Point to Receiver logic - using UPSERT equivalent logic
-        await query(`
-            INSERT INTO reputation (user_id, rep_points, last_given) VALUES (?, 1, 0)
-            ON DUPLICATE KEY UPDATE rep_points = rep_points + 1
-        `, [receiverId]);
+        // Add Point to Receiver logic - using SQLite UPSERT
+        const receiverExists = await get('SELECT user_id, rep_points FROM reputation WHERE user_id = ?', [receiverId]);
+        if (receiverExists) {
+            await query('UPDATE reputation SET rep_points = rep_points + 1 WHERE user_id = ?', [receiverId]);
+        } else {
+            await query('INSERT INTO reputation (user_id, rep_points, last_given) VALUES (?, 1, 0)', [receiverId]);
+        }
 
         return { success: true, message: "Respect +1! Reputasi berhasil dikirim." };
     }

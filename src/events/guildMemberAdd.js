@@ -17,12 +17,17 @@ export default {
                 const accountAge = Date.now() - member.user.createdTimestamp;
                 const isFake = accountAge < (3 * 24 * 60 * 60 * 1000);
 
-                await query(
-                    `INSERT INTO invites (guild_id, inviter_id, invited_id, code, timestamp, is_valid, is_fake, created_at, updated_at) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW()) 
-                     ON DUPLICATE KEY UPDATE updated_at = NOW()`,
-                    [guild.id, inviter.id, member.id, usedInvite.code, Date.now(), true, isFake]
-                );
+                const now = Math.floor(Date.now() / 1000);
+                const existing = await get('SELECT * FROM invites WHERE inviter_id = ? AND invited_id = ?', [inviter.id, member.id]);
+                if (existing) {
+                    await query('UPDATE invites SET updated_at = ? WHERE inviter_id = ? AND invited_id = ?', [now, inviter.id, member.id]);
+                } else {
+                    await query(
+                        `INSERT INTO invites (guild_id, inviter_id, invited_id, code, timestamp, is_valid, is_fake, created_at, updated_at) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        [guild.id, inviter.id, member.id, usedInvite.code, Date.now(), true, isFake, now, now]
+                    );
+                }
 
                 console.log(`[Invite] ${member.user.tag} invited by ${inviter.tag} (Code: ${usedInvite.code})`);
             } else {
